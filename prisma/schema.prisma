@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
+}
+
+model Product {
+  id         Int      @id @default(autoincrement())
+  name       String
+  price      Int
+  stock      Int
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@index([categoryId])
+  @@index([name])
+}
+
+model User {
+  id            Int    @id @default(autoincrement())
+  name          String
+  email         String @unique
+  role          String @default("user")
+  // Lab 4 : la version "vibe codeur" stocke le mot de passe en clair...
+  passwordPlain String
+  // ... la version "dev augmenté" utilise un hash bcrypt
+  passwordHash  String
+  posts         Post[]
+}
+
+model Post {
+  id       Int    @id @default(autoincrement())
+  title    String
+  authorId Int
+  author   User   @relation(fields: [authorId], references: [id])
+
+  @@index([authorId])
+}
